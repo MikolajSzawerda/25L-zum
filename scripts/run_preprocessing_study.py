@@ -10,9 +10,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestClassifier
 from config import INPUT_DATA_DIR, RAW_DATA_DIR, OUTPUT_DATA_DIR
-from experiment_configs import EXPERIMENT_CONFIG, PREPROCESSING_CONFIGS, VECTORIZER_CONFIGS
-from experiment_runner import ExperimentRunner
-from preprocessing import TextPreprocessor
+from spamclassifier.experiment_configs import EXPERIMENT_CONFIG, PREPROCESSING_CONFIGS, VECTORIZER_CONFIGS
+from spamclassifier.experiment_runner import ExperimentRunner
+from spamclassifier.preprocessing import TextPreprocessor
 from tqdm import tqdm
 
 def load_data():

@@ -5,7 +5,7 @@ from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 from typing import List, Optional
 import numpy as np
-
+from gensim.models import Word2Vec
 
 class TextPreprocessor(BaseEstimator, TransformerMixin):
     def __init__(self, 
@@ -89,3 +89,77 @@ class TextPreprocessor(BaseEstimator, TransformerMixin):
 
     def get_feature_names_out(self, input_features=None):
         return np.array(['preprocessed_text'], dtype=object) 
+
+
+class Word2VecVectorizer(BaseEstimator, TransformerMixin):
+    def __init__(self, 
+                 vector_size: int = 100,
+                 window: int = 5,
+                 min_count: int = 1,
+                 workers: int = 4,
+                 sg: int = 0,
+                 epochs: int = 10,
+                 seed: int = 42):
+        self.vector_size = vector_size
+        self.window = window
+        self.min_count = min_count
+        self.workers = workers
+        self.sg = sg
+        self.epochs = epochs
+        self.seed = seed
+        self.model = None
+        
+    def fit(self, X, y=None):
+        sentences = []
+        for text in X:
+            if isinstance(text, str) and text.strip():
+                tokens = text.strip().split()
+                if tokens:  # Only add non-empty token lists
+                    sentences.append(tokens)
+        
+        if not sentences:
+            raise ValueError("No valid sentences found for training Word2Vec model")
+        
+        self.model = Word2Vec(
+            sentences=sentences,
+            vector_size=self.vector_size,
+            window=self.window,
+            min_count=self.min_count,
+            workers=self.workers,
+            sg=self.sg,
+            epochs=self.epochs,
+            seed=self.seed
+        )
+        
+        return self
+    
+    def transform(self, X):
+        if self.model is None:
+            raise ValueError("Word2Vec model not fitted. Call fit() first.")
+        
+        vectors = []
+        for text in X:
+            if isinstance(text, str) and text.strip():
+                tokens = text.strip().split()
+                token_vectors = []
+                for token in tokens:
+                    if token in self.model.wv:
+                        token_vectors.append(self.model.wv[token])
+                
+                if token_vectors:
+                    doc_vector = np.mean(token_vectors, axis=0)
+                else:
+                    doc_vector = np.zeros(self.vector_size)
+            else:
+                doc_vector = np.zeros(self.vector_size)
+            
+            vectors.append(doc_vector)
+        
+        return np.array(vectors)
+    
+    def fit_transform(self, X, y=None):
+        return self.fit(X, y).transform(X)
+    
+    def get_feature_names_out(self, input_features=None):
+        return np.array([f'word2vec_{i}' for i in range(self.vector_size)], dtype=object) 
+

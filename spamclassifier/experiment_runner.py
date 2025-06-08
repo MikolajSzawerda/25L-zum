@@ -6,7 +6,7 @@ from sklearn.metrics import classification_report, confusion_matrix, accuracy_sc
 import joblib
 from pathlib import Path
 import time
-from config import OUTPUT_DATA_DIR, PROJ_ROOT
+from scripts.config import OUTPUT_DATA_DIR, PROJ_ROOT
 
 
 class ExperimentRunner:
@@ -48,7 +48,7 @@ class ExperimentRunner:
         compatible_scoring = self._get_compatible_scoring(pipeline, X_train, y_train, scoring)
         
         if param_grid:
-            grid_search = GridSearchCV(pipeline, param_grid, cv=cv, scoring='f1_macro', n_jobs=-1)
+            grid_search = GridSearchCV(pipeline, param_grid, cv=cv, scoring='f1_macro', n_jobs=4, verbose=3)
             grid_search.fit(X_train, y_train)
             best_pipeline = grid_search.best_estimator_
             best_params = grid_search.best_params_

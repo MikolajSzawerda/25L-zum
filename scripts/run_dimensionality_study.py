@@ -2,12 +2,12 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
 from sklearn.preprocessing import StandardScaler
-from config import RAW_DATA_DIR
-from experiment_configs import EXPERIMENT_CONFIG, PREPROCESSING_CONFIGS, VECTORIZER_CONFIGS, DIMENSIONALITY_CONFIGS
-from experiment_runner import ExperimentRunner
-from preprocessing import TextPreprocessor
+from scripts.config import RAW_DATA_DIR
+from spamclassifier.experiment_configs import EXPERIMENT_CONFIG, PREPROCESSING_CONFIGS, VECTORIZER_CONFIGS, DIMENSIONALITY_CONFIGS
+from spamclassifier.experiment_runner import ExperimentRunner
+from spamclassifier.preprocessing import TextPreprocessor
 from tqdm import tqdm
 
 
@@ -65,7 +65,7 @@ def main():
     preprocessor = TextPreprocessor(**PREPROCESSING_CONFIGS['standard'])
     vectorizer_config = VECTORIZER_CONFIGS['tfidf_bigram']
     vectorizer = vectorizer_config['vectorizer'](**vectorizer_config['params'])
-    base_model = RandomForestClassifier(n_estimators=100, random_state=42)
+    base_model = SVC(kernel='linear', probability=True, random_state=42)
     
     # Get the actual feature count after vectorization
     n_features = get_feature_count(X_train, y_train, preprocessor, vectorizer)

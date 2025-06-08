@@ -10,9 +10,9 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from config import INPUT_DATA_DIR, RAW_DATA_DIR
-from experiment_configs import EXPERIMENT_CONFIG, ALGORITHM_CONFIGS, PREPROCESSING_CONFIGS, VECTORIZER_CONFIGS
-from experiment_runner import ExperimentRunner
-from preprocessing import TextPreprocessor
+from spamclassifier.experiment_configs import EXPERIMENT_CONFIG, ALGORITHM_CONFIGS, PREPROCESSING_CONFIGS, VECTORIZER_CONFIGS
+from spamclassifier.experiment_runner import ExperimentRunner
+from spamclassifier.preprocessing import TextPreprocessor 
 from tqdm import tqdm
 
 def load_data():
@@ -27,12 +27,11 @@ def main():
         X, y, test_size=EXPERIMENT_CONFIG['test_size'], 
         random_state=EXPERIMENT_CONFIG['random_state'], stratify=y
     )
-    
     runner = ExperimentRunner()
     results = []
     
     preprocessor = TextPreprocessor(**PREPROCESSING_CONFIGS['standard'])
-    vectorizer_config = VECTORIZER_CONFIGS['tfidf_bigram']
+    vectorizer_config = VECTORIZER_CONFIGS['tfidf_unigram']
     vectorizer = vectorizer_config['vectorizer'](**vectorizer_config['params'])
     
     for algo_name, algo_config in tqdm(ALGORITHM_CONFIGS.items(), desc="Algorithm Configs"):

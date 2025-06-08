@@ -6,6 +6,7 @@ from sklearn.feature_selection import SelectKBest, chi2, mutual_info_classif, f_
 from sklearn.preprocessing import StandardScaler
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.model_selection import RepeatedStratifiedKFold
+from spamclassifier.preprocessing import Word2VecVectorizer
 
 try:
     from xgboost import XGBClassifier
@@ -31,7 +32,9 @@ VECTORIZER_CONFIGS = {
     'tfidf_unigram': {'vectorizer': TfidfVectorizer, 'params': {'max_features': 10000, 'ngram_range': (1, 1), 'min_df': 2, 'max_df': 0.95}},
     'tfidf_bigram': {'vectorizer': TfidfVectorizer, 'params': {'max_features': 10000, 'ngram_range': (1, 2), 'min_df': 2, 'max_df': 0.95}},
     'count_unigram': {'vectorizer': CountVectorizer, 'params': {'max_features': 10000, 'ngram_range': (1, 1), 'min_df': 2, 'max_df': 0.95}},
-    'count_bigram': {'vectorizer': CountVectorizer, 'params': {'max_features': 10000, 'ngram_range': (1, 2), 'min_df': 2, 'max_df': 0.95}}
+    'count_bigram': {'vectorizer': CountVectorizer, 'params': {'max_features': 10000, 'ngram_range': (1, 2), 'min_df': 2, 'max_df': 0.95}},
+    'word2vec_skipgram': {'vectorizer': Word2VecVectorizer, 'params': {'vector_size': 100, 'window': 5, 'min_count': 1, 'sg': 1, 'epochs': 15, 'seed': 42}},
+    'word2vec_large': {'vectorizer': Word2VecVectorizer, 'params': {'vector_size': 200, 'window': 10, 'min_count': 2, 'sg': 0, 'epochs': 15, 'seed': 42}}
 }
 
 ALGORITHM_CONFIGS = {
@@ -50,9 +53,9 @@ ALGORITHM_CONFIGS = {
     'RandomForest': {
         'model': RandomForestClassifier(random_state=42),
         'param_grid': {
-            'model__n_estimators': [50, 100, 200],
-            'model__max_depth': [None, 10, 20, 30],
-            'model__max_features': ['sqrt', 'log2', None],
+            'model__n_estimators': [100, 300],
+            'model__max_depth': [None, 20],
+            'model__max_features': ['sqrt'],
             'model__class_weight': [None, 'balanced']
         }
     }
@@ -62,11 +65,11 @@ if XGBClassifier is not None:
     ALGORITHM_CONFIGS['XGBoost'] = {
         'model': XGBClassifier(random_state=42, eval_metric='logloss'),
         'param_grid': {
-            'model__max_depth': [3, 6, 10],
-            'model__min_child_weight': [1, 3, 5],
-            'model__learning_rate': [0.01, 0.1, 0.2],
-            'model__subsample': [0.8, 0.9, 1.0],
-            'model__colsample_bytree': [0.8, 0.9, 1.0]
+            'model__max_depth': [4, 6],
+            'model__min_child_weight': [1, 4],
+            'model__learning_rate': [0.05, 0.1],
+            'model__subsample': [0.85],
+            'model__colsample_bytree': [0.85]
         }
     }
 
